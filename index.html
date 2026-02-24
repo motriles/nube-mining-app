@@ -6,66 +6,40 @@
     <title>Nube Mining</title>
     <script src="https://cdn.jsdelivr.net/npm/@worldcoin/minikit-js@latest/dist/minikit.min.js"></script>
     <style>
-        body {
-            background-color: #000000;
-            color: #ffffff;
-            font-family: sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            text-align: center;
-        }
-        .container { padding: 20px; }
-        .logo { font-size: 60px; margin-bottom: 10px; }
-        h1 { font-size: 22px; letter-spacing: 1px; }
-        p { color: #888; font-size: 14px; margin-bottom: 30px; }
-        .btn-gold {
-            background: linear-gradient(45deg, #d4af37, #f9e27d);
-            color: #000;
-            border: none;
-            padding: 15px 35px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-        #status { font-size: 10px; color: #444; margin-top: 20px; }
-        #main-content { display: none; }
+        body { background-color: #000; color: #fff; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; }
+        .btn-gold { background: linear-gradient(45deg, #d4af37, #f9e27d); color: #000; border: none; padding: 15px 35px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); }
+        #status { font-size: 12px; color: #555; margin-top: 15px; }
+        #main-app { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="verify-screen" class="container">
-        <div class="logo">☁️</div>
+    <div id="verify-screen">
+        <div style="font-size: 50px;">☁️</div>
         <h1>NUBE MINING</h1>
-        <p>Verifica tu World ID para comenzar</p>
+        <p style="color: #888;">Verifica tu World ID para minar</p>
         <button class="btn-gold" onclick="verificar()">CONECTAR WORLD ID</button>
-        <div id="status">Esperando World App...</div>
+        <div id="status">Iniciando...</div>
     </div>
 
-    <div id="main-content" class="container">
-        <div class="logo">⛏️</div>
+    <div id="main-app">
+        <div style="font-size: 50px;">⛏️</div>
         <h1 style="color: #4ade80;">MINERÍA ACTIVA</h1>
-        <p>Procesando bloques en la nube...</p>
+        <p>Procesando bloques...</p>
     </div>
 
     <script>
-        // Configuración
         const APP_ID = "app_d77095720a626cfb6315c02b5b5f2473";
-        const ACTION = "acceso-nube";
+        const ACTION = "acceso-nube"; // Coincide con tu Identifier del portal
 
-        // Iniciar el sistema al cargar la página
         async function init() {
             try {
                 await window.MiniKit.install(APP_ID);
-                document.getElementById('status').innerText = "CONECTADO A WORLD APP ✅";
-                document.getElementById('status').style.color = "#4ade80";
+                if (window.MiniKit.isInstalled()) {
+                    document.getElementById('status').innerText = "CONECTADO A WORLD APP ✅";
+                }
             } catch (e) {
-                document.getElementById('status').innerText = "⚠️ ABRE ESTA WEB DESDE WORLD APP";
+                document.getElementById('status').innerText = "⚠️ ABRE DESDE WORLD APP";
             }
         }
 
@@ -78,14 +52,15 @@
 
                 if (res.finalPayload) {
                     document.getElementById('verify-screen').style.display = 'none';
-                    document.getElementById('main-content').style.display = 'block';
+                    document.getElementById('main-app').style.display = 'block';
                 }
             } catch (err) {
-                alert("Error o cancelación. Inténtalo de nuevo.");
+                // Si el portal sigue dando error, mostramos el detalle técnico
+                console.error(err);
+                alert("Error de comunicación con el Portal. Revisa que la Acción esté en modo Staging.");
             }
         }
 
-        // Arrancar
         init();
     </script>
 </body>
