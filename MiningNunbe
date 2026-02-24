@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NUBE MINING v7.5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@worldcoin/minikit-js@latest/dist/minikit.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: #05070a; color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding-top: 35px; overflow: hidden; }
+        .font-crypto { font-family: 'Orbitron', sans-serif; }
+        .top-bar { position: fixed; top: 0; left: 0; right: 0; height: 32px; background: #000; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; border-bottom: 1px solid #1a1a1a; z-index: 4000; font-family: 'Orbitron', sans-serif; }
+        .compra-tag { color: #4ade80; font-weight: bold; font-size: 8px; }
+        .compra-monto { color: #f6e05e; font-weight: 800; font-size: 9px; margin-left: 5px; }
+        .glass-card { background: #0d1117; border: 1px solid #21262d; border-radius: 35px; padding: 1.8rem; width: 92%; max-width: 380px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.9); position: relative; }
+        #saldo { font-size: 4rem; font-weight: 700; color: #ffffff; line-height: 1; margin-bottom: 5px; }
+        .progress-container { width: 100%; height: 8px; background: #161b22; border-radius: 10px; border: 1px solid #30363d; overflow: hidden; margin: 15px 0; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #f6e05e, #4ade80); width: 0%; transition: width 1.2s ease-in-out; }
+        .gold-btn { background: linear-gradient(135deg, #f6e05e, #d69e2e); color: #000; font-weight: 900; border-radius: 15px; padding: 16px; width: 100%; cursor: pointer; border: none; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; transition: 0.3s; }
+        .gold-btn:active { transform: scale(0.98); opacity: 0.9; }
+        /* Pantalla de Verificación */
+        #verify-screen { position: fixed; inset: 0; background: #05070a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+
+    <div id="verify-screen">
+        <div class="glass-card">
+            <h2 class="text-xl font-bold mb-4 font-crypto text-yellow-500">ACCESO NUBE</h2>
+            <p class="text-[10px] text-gray-400 mb-6 uppercase tracking-[0.2em]">Se requiere World ID para minar</p>
+            <button onclick="verificarConWorldID()" class="gold-btn">CONECTAR WORLD ID</button>
+            <p id="status-sdk" class="text-[9px] mt-4 text-red-500 font-mono italic">CARGANDO PROTOCOLO...</p>
+        </div>
+    </div>
+
+    <div class="top-bar">
+        <div><span class="compra-tag">RED:</span><span id="monto-real" class="compra-monto">CONECTADO</span></div>
+        <span style="color:#4b5563; font-size:7px; font-family: 'Orbitron';">WORLD CHAIN ACTIVE</span>
+    </div>
+
+    <div class="glass-card">
+        <div id="user-id" class="text-[10px] text-yellow-500/90 mb-4 font-mono font-bold tracking-[0.2em]">ESPERANDO OPERADOR...</div>
+        <div id="saldo" class="font-crypto">0.00</div>
+        <div class="text-white/40 text-[9px] mb-4 uppercase font-bold tracking-widest">Nubes Acumuladas</div>
+        
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+
+        <button id="btn-main" onclick="minarAhora()" class="gold-btn">INICIAR MINERÍA</button>
+        <p id="live-notif" class="mt-4 text-[8px] text-green-500 uppercase font-bold tracking-widest">SISTEMA EN LÍNEA</p>
+    </div>
+
+    <script>
+        // TUS DATOS DEL PORTAL
+        const APP_ID = "app_d77095720a626cfb6315c02b5b5f2473";
+        const ACTION = "acceso-nube";
+
+        // 1. INICIALIZAR EL SDK
+        function initWorldcoin() {
+            if (window.MiniKit && typeof window.MiniKit.commands !== 'undefined') {
+                window.MiniKit.install(APP_ID);
+                document.getElementById('status-sdk').innerText = "LISTO PARA VERIFICAR ✅";
+                document.getElementById('status-sdk').className = "text-green-500 text-[9px] mt-4 font-mono";
+            } else {
+                setTimeout(initWorldcoin, 500);
+            }
+        }
+
+        // 2. FUNCIÓN DE VERIFICACIÓN
+        async function verificarConWorldID() {
+            try {
+                const { finalPayload } = await window.MiniKit.commands.verify({
+                    action: ACTION,
+                    signal: "user-" + Math.floor(Math.random()*99999),
+                });
+                
+                if (finalPayload) {
+                    // Si la verificación es exitosa, escondemos la pantalla negra
+                    document.getElementById('verify-screen').style.opacity = "0";
+                    setTimeout(() => {
+                        document.getElementById('verify-screen').style.display = 'none';
+                        document.getElementById('user-id').innerText = "OPERADOR VERIFICADO ✅";
+                    }, 500);
+                }
+            } catch (error) {
+                alert("Error: Debes abrir esto desde la World App");
+            }
+        }
+
+        // 3. LÓGICA DE MINERÍA
+        let saldo = 0;
+        function minarAhora() {
+            const btn = document.getElementById('btn-main');
+            btn.innerText = "MINANDO...";
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+
+            setTimeout(() => {
+                saldo += 10.50;
+                document.getElementById('saldo').innerText = saldo.toFixed(2);
+                
+                // Animación de barra
+                let p = Math.min((saldo / 500) * 100, 100);
+                document.getElementById('progress-bar').style.width = p + "%";
+
+                btn.innerText = "INICIAR MINERÍA";
+                btn.disabled = false;
+                btn.style.opacity = "1";
+            }, 2000);
+        }
+
+        window.onload = initWorldcoin;
+    </script>
+</body>
+</html>
