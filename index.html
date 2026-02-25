@@ -3,20 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nube Mining</title>
-    <!-- SDK oficial de MiniKit para Mini Apps -->
+    <title>Nube Mining ☁️</title>
+    
+    <!-- SDK oficial para Mini Apps (No necesita backend para funcionar) -->
     <script src="https://unpkg.com"></script>
+
     <style>
-        body { font-family: sans-serif; background: linear-gradient(180deg, #87CEEB 0%, #E0F7FA 100%); display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
-        .card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 85%; max-width: 400px; }
-        button { background: #000; color: #fff; border: none; padding: 18px 25px; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; margin-top: 20px; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
+        body { font-family: 'Segoe UI', sans-serif; background: #87CEEB; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 40px; border-radius: 28px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); width: 85%; max-width: 400px; text-align: center; }
+        h1 { color: #333; margin-bottom: 10px; }
+        p { color: #666; margin-bottom: 30px; font-size: 1.1rem; }
+        .btn-verify { background: #000; color: #fff; border: none; padding: 20px; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
+        .btn-verify:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-verify:active { transform: scale(0.96); }
     </style>
 </head>
 <body>
+
     <div class="card">
         <h1>Nube Mining ☁️</h1>
-        <p id="status">Conectando con World ID...</p>
+        <p id="status">Conectando con World App...</p>
         <button id="btnVerify" onclick="verificar()" disabled>Cargando...</button>
     </div>
 
@@ -24,19 +30,23 @@
         const btn = document.getElementById('btnVerify');
         const status = document.getElementById('status');
 
-        // Inicialización obligatoria
+        // Inicialización automática al abrir la Mini App
         window.onload = () => {
             if (window.MiniKit) {
                 window.MiniKit.install();
                 btn.disabled = false;
                 btn.innerText = "Verificar Humanidad";
                 status.innerText = "Listo para reclamar minado.";
+            } else {
+                status.innerText = "Error: Abre esto desde World App.";
             }
         };
 
         async function verificar() {
+            status.innerText = "Esperando verificación...";
+            
             try {
-                // Usamos los datos EXACTOS de tu captura
+                // Comando simplificado para Mini Apps (World ID 4.0)
                 const { finalPayload } = await window.MiniKit.commandsAsync.verify({
                     app_id: "app_24d21904fe935d93b843588efab756fc", 
                     action: "claim-daily-mining", 
@@ -44,16 +54,21 @@
                 });
 
                 if (finalPayload.status === "success") {
-                    status.innerText = "✅ ¡Verificación Exitosa!";
-                    btn.innerText = "Minado Activo";
+                    status.innerHTML = "<b style='color:green;'>✅ ¡HUMANO VERIFICADO!</b>";
+                    btn.innerText = "Minería Iniciada";
                     btn.style.background = "#4CAF50";
-                    alert("¡Humano verificado! Has reclamado tu minado diario.");
+                    alert("¡Éxito! Has reclamado tu minado diario de Token Nube.");
+                } else {
+                    status.innerText = "La verificación no se completó.";
                 }
+
             } catch (error) {
-                console.error("Error:", error);
-                alert("La verificación falló. Asegúrate de estar dentro de la World App.");
+                console.error("Error MiniKit:", error);
+                status.innerText = "Error en la conexión.";
+                alert("Hubo un error. Asegúrate de estar en la World App.");
             }
         }
     </script>
+
 </body>
 </html>
