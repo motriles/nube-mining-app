@@ -3,69 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nube Mining - Verificación</title>
-    <script src="https://cdn.jsdelivr.net/npm/@worldcoin/minikit-js@latest"></script>
+    <title>NUBE Mini App</title>
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f4f4f9; }
-        .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; max-width: 90%; }
-        button { background-color: #ebbb40; color: black; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; transition: transform 0.2s; }
-        button:active { transform: scale(0.95); }
-        .status { margin-top: 20px; font-size: 14px; color: #666; }
+        body { font-family: sans-serif; background: #000; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        button { background: #fff; color: #000; border: none; padding: 18px 35px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>☁️ NUBE Mining</h2>
-        <p>Para activar tu cuenta de minería, primero confirma que eres un humano verificado.</p>
-        
-        <button id="verify-button">CONECTAR WORLD ID</button>
-        
-        <div id="status-message" class="status">Esperando conexión...</div>
-    </div>
+    <h1>Minería NUBE ☁️</h1>
+    <p>Verificación On-chain</p>
+    <button id="btn-verify">VERIFICAR AHORA</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/@worldcoin/minikit-js@latest"></script>
 
     <script>
-        // Inicializamos MiniKit con tu App ID real
         const appId = 'app_d77095720a626cfb6315c02b5b5f2473';
         const action = 'confirm-human';
 
-        async function initMiniKit() {
-            try {
-                await MiniKit.install(appId);
-                console.log("MiniKit instalado correctamente");
-            } catch (error) {
-                console.error("Error instalando MiniKit:", error);
+        window.addEventListener('load', () => {
+            if (window.MiniKit) {
+                MiniKit.install(appId);
             }
-        }
+        });
 
-        document.getElementById('verify-button').onclick = async () => {
-            const status = document.getElementById('status-message');
-            status.innerText = "Abriendo World App...";
-
-            // Generamos un 'nonce' aleatorio por seguridad (Normativa Worldcoin)
-            const cryptoNonce = Math.random().toString(36).substring(2);
-
-            try {
+        document.getElementById('btn-verify').onclick = async () => {
+            if (window.MiniKit && MiniKit.isInstalled()) {
                 const { finalPayload } = await MiniKit.commands.verify({
                     action: action,
-                    signal: cryptoNonce, // Seguridad contra ataques de repetición
+                    signal: 'session_' + Math.floor(Math.random() * 100000),
+                    verification_level: 'orb', // Obligatorio para On-chain
                 });
 
-                if (finalPayload.status === 'error') {
-                    status.innerText = "Error: " + finalPayload.details;
-                    status.style.color = "red";
+                if (finalPayload.status === 'success') {
+                    alert("¡Verificación On-chain completada!");
                 } else {
-                    status.innerText = "✅ ¡Verificación exitosa! Portal activado.";
-                    status.style.color = "green";
-                    // Aquí es donde en el futuro redirigiremos al minador real
+                    alert("Error: " + finalPayload.details);
                 }
-            } catch (err) {
-                status.innerText = "Error de comunicación con el Portal";
-                status.style.color = "orange";
+            } else {
+                alert("Abre esto desde la World App");
             }
         };
-
-        initMiniKit();
     </script>
 </body>
 </html>
