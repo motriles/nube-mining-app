@@ -45,5 +45,29 @@
             }
         };
     </script>
+
+    const appId = 'app_d77095720a626cfb6315c02b5b5f2473';
+const action = 'confirm-human';
+
+// Solo instalamos MiniKit, sin alertas molestas
+window.addEventListener('load', () => {
+    if (window.MiniKit) {
+        MiniKit.install(appId);
+    }
+});
+
+document.getElementById('verify-button').onclick = async () => {
+    // Intentamos la verificación directamente
+    try {
+        await MiniKit.commands.verify({
+            action: action,
+            signal: 'user_' + Math.floor(Math.random() * 1000),
+            verification_level: 'orb', 
+        });
+    } catch (e) {
+        console.log("Esperando conexión...");
+    }
+};
+
 </body>
 </html>
