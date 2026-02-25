@@ -2,62 +2,51 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NUBE Mining</title>
-    <style>
-        body { font-family: sans-serif; background: #000; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
-        .card { padding: 30px; border-radius: 20px; background: #111; border: 1px solid #333; }
-        h1 { font-size: 24px; margin-bottom: 10px; }
-        p { color: #888; margin-bottom: 30px; }
-        #verify-button { 
-            background: #ffffff; color: #000; border: none; padding: 18px 40px; 
-            font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nube Mining - Worldcore</title>
+    
+    <!-- Librería MiniKit para World App -->
+    <script type="module">
+      import { MiniKit } from "https://cdn.jsdelivr.net";
+      window.MiniKit = MiniKit;
+      // Importante: Inicializa la conexión
+      MiniKit.install();
+    </script>
 </head>
-<body>
+<body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
 
-    <div class="card">
-        <h1>NUBE Mining ☁️</h1>
-        <p>Verificación On-chain requerida</p>
-        <button id="verify-button">VERIFICAR AHORA</button>
-    </div>
+    <h1>Nube Mining ☁️</h1>
+    <p>Verifica tu humanidad para empezar a minar.</p>
 
-    <script src="https://cdn.jsdelivr.net/npm/@worldcoin/minikit-js@latest"></script>
+    <!-- Botón de verificación -->
+    <button onclick="verificarYMinar()" style="padding: 20px; font-size: 18px; background: black; color: white; border-radius: 10px; border: none; cursor: pointer;">
+        Verificar con World ID
+    </button>
 
     <script>
-        const appId = 'app_d77095720a626cfb6315c02b5b5f2473';
-        const action = 'confirm-human';
+      async function verificarYMinar() {
+        if (!window.MiniKit || !window.MiniKit.isInstalled()) {
+          alert("Por favor, abre esta página dentro de la World App.");
+          return;
+        }
 
-        // Inicializamos MiniKit en cuanto carga
-        window.addEventListener('load', async () => {
-            if (window.MiniKit) {
-                await MiniKit.install(appId);
-                console.log("MiniKit Instalado");
-            }
-        });
+        try {
+          // Usamos el ID de acción que creaste: iniciar-mineria
+          const { finalPayload } = await window.MiniKit.commandsAsync.verify({
+            action: "iniciar-mineria", 
+            verification_level: "Orb" 
+          });
 
-        document.getElementById('verify-button').onclick = async () => {
-            if (typeof MiniKit === 'undefined' || !MiniKit.isInstalled()) {
-                alert("Por favor, abre esto desde dentro de World App.");
-                return;
-            }
-
-            try {
-                // Comando de verificación específico para Mini Apps
-                const { finalPayload } = await MiniKit.commands.verify({
-                    action: action,
-                    signal: 'user_' + Math.floor(Math.random() * 10000),
-                    verification_level: 'orb', // Obligatorio para On-chain
-                });
-
-                if (finalPayload.status === 'success') {
-                    alert("¡Verificado con éxito!");
-                }
-            } catch (error) {
-                console.error("Error:", error);
-            }
-        };
+          if (finalPayload.status === "success") {
+            alert("¡Verificación exitosa! Bienvenido a la línea Worldcore.");
+            // Aquí puedes añadir la lógica de inicio de minería
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Hubo un problema con la verificación.");
+        }
+      }
     </script>
+
 </body>
 </html>
