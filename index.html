@@ -33,8 +33,8 @@
         try {
           // Usamos el ID de acción que creaste: iniciar-mineria
           const { finalPayload } = await window.MiniKit.commandsAsync.verify({
-            action: "iniciar-mineria", 
-            verification_level: "Orb" 
+            action: "claim-daily-mining", 
+            verification_level: "orb" 
           });
 
           if (finalPayload.status === "success") {
