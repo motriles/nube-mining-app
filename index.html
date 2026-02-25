@@ -4,12 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nube Mining</title>
-    <script src="https://cdn.jsdelivr.net"></script>
+    
+    <!-- SDK Corregido de MiniKit -->
+    <script src="https://unpkg.com"></script>
+
     <style>
-        body { font-family: sans-serif; background: #87CEEB; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
-        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 80%; }
-        button { background: #000; color: #fff; border: none; padding: 15px 25px; border-radius: 30px; font-size: 18px; cursor: pointer; width: 100%; transition: 0.3s; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
+        body { font-family: sans-serif; background: linear-gradient(180deg, #87CEEB 0%, #E0F7FA 100%); display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 80%; max-width: 400px; }
+        h1 { margin-top: 0; color: #333; }
+        p { color: #666; margin-bottom: 25px; }
+        button { background: #000; color: #fff; border: none; padding: 18px 25px; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        button:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
+        button:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -20,33 +26,50 @@
     </div>
 
     <script>
-        // Forzamos la instalación y activamos el botón solo cuando esté listo
         const btn = document.getElementById('btnVerify');
         const status = document.getElementById('status');
 
         function inicializar() {
-            try {
-                window.MiniKit.install();
-                btn.disabled = false;
-                btn.innerText = "Verificar con World ID";
-                status.innerText = "Sistema listo para minar.";
-            } catch (e) {
-                setTimeout(inicializar, 1000); // Reintenta cada segundo si falla
+            // Verificamos si MiniKit está disponible en el objeto window
+            if (window.MiniKit) {
+                try {
+                    window.MiniKit.install();
+                    btn.disabled = false;
+                    btn.innerText = "Verificar con World ID";
+                    status.innerText = "Sistema listo para minar.";
+                    console.log("MiniKit instalado con éxito");
+                } catch (e) {
+                    console.error("Error instalando MiniKit:", e);
+                    setTimeout(inicializar, 500);
+                }
+            } else {
+                console.log("Esperando a MiniKit...");
+                setTimeout(inicializar, 500);
             }
         }
 
         async function verificar() {
             try {
+                // IMPORTANTE: Asegúrate de que "claim-daily-mining" existe en tu Portal
                 const { finalPayload } = await window.MiniKit.commandsAsync.verify({
-                    action: "claim-daily-mining",
-                    verification_level: "orb"
+                    action: "claim-daily-mining", 
+                    verification_level: "orb",
+                    app_id: "app_24d21904fe935d93b843588efab756fc" // Tu App ID para asegurar el enlace
                 });
-                if (finalPayload.status === "success") alert("¡Éxito! Humano verificado.");
+
+                if (finalPayload.status === "success") {
+                    status.innerText = "✅ ¡Humano verificado! Minando...";
+                    btn.style.background = "#4CAF50";
+                    btn.innerText = "Minería Activa";
+                    alert("¡Éxito! Has iniciado la minería diaria.");
+                }
             } catch (error) {
-                console.error(error);
+                console.error("Error en verificación:", error);
+                alert("Hubo un problema. Asegúrate de estar en la World App.");
             }
         }
 
+        // Ejecutar inicialización al cargar la ventana
         window.onload = inicializar;
     </script>
 </body>
