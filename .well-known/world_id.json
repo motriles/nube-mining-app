@@ -1,1 +1,13 @@
-https://vercel.com/mineriaappnube-9340s-projects/nube-mining-app-wgkf
+{
+  "app_id": "rp_9de9e52409ced0a1",
+  "verification_methods": [
+    {
+      "id": "rp_9de9e52409ced0a1",
+      "type": "Orb",
+      "controller": "rp_9de9e52409ced0a1"
+    }
+  ],
+  "allowed_origins": [
+    "https://nube-mining-app-wgkf.vercel.app"
+  ]
+}
