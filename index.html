@@ -2,101 +2,62 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NUBE Mining - Verificación</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NUBE Mining</title>
     <style>
-        /* Estilo moderno y limpio para tu App */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #000000;
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
-        }
-        .container {
-            padding: 20px;
-        }
-        .logo {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 20px;
-            border-radius: 20px;
-        }
-        h1 { font-size: 26px; margin-bottom: 10px; }
-        p { color: #888; margin-bottom: 40px; font-size: 16px; }
-        
-        /* Botón estilo World App */
-        #verify-button {
-            background-color: #ffffff;
-            color: #000000;
-            border: none;
-            padding: 18px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        #verify-button:active {
-            transform: scale(0.95);
+        body { font-family: sans-serif; background: #000; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+        .card { padding: 30px; border-radius: 20px; background: #111; border: 1px solid #333; }
+        h1 { font-size: 24px; margin-bottom: 10px; }
+        p { color: #888; margin-bottom: 30px; }
+        #verify-button { 
+            background: #ffffff; color: #000; border: none; padding: 18px 40px; 
+            font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <img src="https://worldcoin.org/icons/logo.svg" alt="NUBE" class="logo">
+    <div class="card">
         <h1>NUBE Mining ☁️</h1>
-        <p>Verifica tu World ID para activar la minería On-chain.</p>
-        
+        <p>Verificación On-chain requerida</p>
         <button id="verify-button">VERIFICAR AHORA</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@worldcoin/minikit-js@latest"></script>
 
     <script>
-        // Tu App ID del Portal de Desarrollador
         const appId = 'app_d77095720a626cfb6315c02b5b5f2473';
         const action = 'confirm-human';
 
-        // 1. Inicializar MiniKit en cuanto cargue la página
-        window.addEventListener('load', () => {
+        // Inicializamos MiniKit en cuanto carga
+        window.addEventListener('load', async () => {
             if (window.MiniKit) {
-                MiniKit.install(appId);
-                console.log("MiniKit listo");
+                await MiniKit.install(appId);
+                console.log("MiniKit Instalado");
             }
         });
 
-        // 2. Función que se activa al pulsar el botón
         document.getElementById('verify-button').onclick = async () => {
-            try {
-                if (window.MiniKit && MiniKit.isInstalled()) {
-                    // Lanzar la verificación oficial
-                    const { finalPayload } = await MiniKit.commands.verify({
-                        action: action,
-                        signal: 'user_' + Math.floor(Math.random() * 10000),
-                        verification_level: 'orb', // Nivel máximo para On-chain
-                    });
+            if (typeof MiniKit === 'undefined' || !MiniKit.isInstalled()) {
+                alert("Por favor, abre esto desde dentro de World App.");
+                return;
+            }
 
-                    if (finalPayload.status === 'success') {
-                        alert("¡Verificación Exitosa! Tu cuenta NUBE se está activando.");
-                    } else {
-                        alert("La verificación no se completó.");
-                    }
-                } else {
-                    // Si no está en la World App, avisamos
-                    alert("Abre esta aplicación desde dentro de World App.");
+            try {
+                // Comando de verificación específico para Mini Apps
+                const { finalPayload } = await MiniKit.commands.verify({
+                    action: action,
+                    signal: 'user_' + Math.floor(Math.random() * 10000),
+                    verification_level: 'orb', // Obligatorio para On-chain
+                });
+
+                if (finalPayload.status === 'success') {
+                    alert("¡Verificado con éxito!");
                 }
             } catch (error) {
                 console.error("Error:", error);
             }
         };
     </script>
-
 </body>
 </html>
