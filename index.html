@@ -5,44 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nube Mining - Worldcore</title>
     
-    <!-- Librería MiniKit para World App -->
-    <script type="module">
-      import { MiniKit } from "https://cdn.jsdelivr.net";
-      window.MiniKit = MiniKit;
-      // Importante: Inicializa la conexión
-      MiniKit.install();
-    </script>
+    <!-- SDK Oficial de MiniKit corregido -->
+    <script src="https://cdn.jsdelivr.net"></script>
+
+    <style>
+        :root {
+            --primary: #000000;
+            --accent: #00c3ff;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(180deg, #87CEEB 0%, #E0F7FA 100%);
+            color: var(--primary);
+        }
+
+        /* Animación de Nubes Worldcore */
+        .clouds {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            opacity: 0.5;
+            background: url('https://www.transparenttextures.com');
+            animation: moveClouds 60s linear infinite;
+        }
+
+        @keyframes moveClouds {
+            from { background-position: 0 0; }
+            to { background-position: 1000px 0; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 80%;
+            text-align: center;
+        }
+
+        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        p { color: #555; margin-bottom: 30px; }
+
+        .btn-verify {
+            padding: 16px 32px;
+            font-size: 18px;
+            font-weight: bold;
+            background: var(--primary);
+            color: white;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-verify:active { transform: scale(0.95); }
+    </style>
 </head>
-<body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
+<body>
 
-    <h1>Nube Mining ☁️</h1>
-    <p>Verifica tu humanidad para empezar a minar.</p>
+    <div class="clouds"></div>
 
-    <!-- Botón de verificación -->
-    <button onclick="verificarYMinar()" style="padding: 20px; font-size: 18px; background: black; color: white; border-radius: 10px; border: none; cursor: pointer;">
-        Verificar con World ID
-    </button>
+    <div class="container">
+        <h1>Nube Mining ☁️</h1>
+        <p>Verifica tu humanidad para entrar en la línea Worldcore.</p>
+
+        <button class="btn-verify" onclick="verificarYMinar()">
+            Verificar con World ID
+        </button>
+    </div>
 
     <script>
-      async function verificarYMinar() {
-        
+        // Inicializar MiniKit nada más cargar
+        window.addEventListener('load', () => {
+            if (window.MiniKit) {
+                window.MiniKit.install();
+                console.log("MiniKit instalado con éxito");
+            }
+        });
 
-        try {
-          // Usamos el ID de acción que creaste: iniciar-mineria
-          const { finalPayload } = await window.MiniKit.commandsAsync.verify({
-            action: "claim-daily-mining", 
-            verification_level: "orb" 
-          });
+        async function verificarYMinar() {
+            // Solo intentamos la verificación si MiniKit está presente
+            if (!window.MiniKit) {
+                alert("Cargando sistema... espera 2 segundos.");
+                return;
+            }
 
-          if (finalPayload.status === "success") {
-            alert("¡Verificación exitosa! Bienvenido a la línea Worldcore.");
-            // Aquí puedes añadir la lógica de inicio de minería
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("Hubo un problema con la verificación.");
+            try {
+                const { finalPayload } = await window.MiniKit.commandsAsync.verify({
+                    action: "claim-daily-mining", 
+                    verification_level: "orb" 
+                });
+
+                if (finalPayload.status === "success") {
+                    alert("¡HUMANO DETECTADO! Bienvenido a la red.");
+                }
+            } catch (error) {
+                console.error("Error de WorldKit:", error);
+                // No mostramos alert aquí para evitar el mensaje molesto al abrir
+            }
         }
-      }
     </script>
 
 </body>
