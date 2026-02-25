@@ -1,11 +1,7 @@
 {
   "name": "Nube Mining",
   "short_name": "Nube",
-  "description": "Minería en la nube verificada con World ID.",
-  "icons":,
+  "app_id": "rp_9de9e52409ced0a1",
   "start_url": "/",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff",
-  "app_id": "app_24d21904fe935d93b843588efab756fc"
+  "display": "standalone"
 }
